@@ -28,15 +28,26 @@ convert('./data/tests.csv')])
     Object.values(dataObj.students).forEach(student => {
       const marksFilter = Object.values(dataObj.marks).filter((mark) => mark.student_id === student.id)
       dataObj.students[student.id - 1].courses = []
-      const studentCourses = {}
+      const studentCourses = dataObj.students[student.id - 1].courses
+      const averages = {}
 
-      console.log("start")
+      // course averages
       marksFilter.forEach(mark => {
-        console.log(mark)
-        studentCourses[dataObj.tests[mark.test_id - 1].course_id] = []
+        const test = Object.values(dataObj.tests).find(test => test.id === mark.test_id)
+        const course = Object.values(dataObj.courses).find(course => course.id === test.course_id)
+        const weightedMark = mark.mark * (test.weight / 100)
+        if (!averages[course.id]) {
+          averages[course.id] = 0
+          averages[course.id] += weightedMark
+        } else {
+          averages[course.id] += weightedMark
+        }
       })
-      console.log("end")
-      // console.log(studentCourses)
+
+      // total average
+      const totalAvg = Object.values(averages).reduce((prev, curr) => prev + curr, 0) / 3
+
+      
     })
   })
   .catch(error => {
